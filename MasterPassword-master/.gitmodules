@@ -1,0 +1,20 @@
+[submodule "External/Pearl"]
+	path = platform-darwin/External/Pearl
+	url = git://github.com/Lyndir/Pearl.git
+[submodule "External/AttributedMarkdown"]
+	path = platform-darwin/External/AttributedMarkdown
+	url = https://github.com/dreamwieber/AttributedMarkdown.git
+[submodule "MasterPassword/Web/js/mpw-js"]
+	path = platform-independent/web/js/mpw-js
+	url = https://github.com/tmthrgd/mpw-js.git
+[submodule "lib/libsodium"]
+	path = lib/libsodium
+	url = https://github.com/jedisct1/libsodium.git
+[submodule "lib/libjson-c"]
+	path = lib/libjson-c
+	url = https://github.com/json-c/json-c.git
+[submodule "public/site"]
+	path = public/site
+	url = https://gitlab.com/MasterPassword/MasterPassword.git
+	branch = gh-pages
+	shallow = true

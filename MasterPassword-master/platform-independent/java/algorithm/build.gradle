@@ -1,0 +1,34 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'Master Password Algorithm Implementation'
+
+tasks.withType( JavaCompile ) {
+    // Native headers
+    options.compilerArgs += ["-h", new File( new File( project.project( ':masterpassword-core' ).projectDir, 'src' ), 'java' ).absolutePath]
+}
+
+configurations {
+    lib
+}
+
+dependencies {
+    implementation group: 'com.lyndir.lhunath.opal', name: 'opal-system', version: '1.7-p2'
+    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.2.1'
+
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.8'
+    api group: 'org.jetbrains', name: 'annotations', version: '16.0.2'
+
+    lib project( path: ':masterpassword-core', configuration: 'default' )
+}
+
+processResources {
+    dependsOn task( type: Sync, 'processResources-lib', {
+        into new File( processResources.outputs.files.singleFile, "lib" )
+
+        dependsOn configurations.lib {
+            files.each { libFile -> from( zipTree( libFile ) ) }
+        }
+    } )
+}

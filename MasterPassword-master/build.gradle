@@ -1,0 +1,55 @@
+import com.github.spotbugs.SpotBugsTask
+
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        gradlePluginPortal()
+    }
+
+    dependencies {
+        classpath group: 'com.android.tools.build', name: 'gradle', version: '3.5.0'
+        classpath group: 'gradle.plugin.com.github.spotbugs', name: 'spotbugs-gradle-plugin', version: '2.0.0'
+    }
+}
+
+allprojects {
+    group = 'com.lyndir.masterpassword'
+    version = '2.7.11'
+}
+
+subprojects {
+    apply plugin: 'com.github.spotbugs'
+
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven { url 'https://maven.lyndir.com' }
+    }
+    dependencies {
+        //spotbugsPlugins group: 'com.h3xstream.findsecbugs', name: 'findsecbugs-plugin', version: '1.11.0'
+        //spotbugsPlugins group: 'com.mebigfatguy.sb-contrib', name: 'sb-contrib', version: '7.4.6'
+    }
+    spotbugs {
+        effort 'max'
+        showProgress true
+    }
+
+    tasks.withType( JavaCompile ) {
+        options.encoding = 'UTF-8'
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+        options.compilerArgs << '-Xlint:unchecked'
+        if (it.name != JavaPlugin.COMPILE_JAVA_TASK_NAME) {
+            options.compilerArgs << '-Xlint:deprecation'
+        }
+    }
+    tasks.withType( SpotBugsTask ) {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+}

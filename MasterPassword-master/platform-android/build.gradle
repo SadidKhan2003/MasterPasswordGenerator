@@ -1,0 +1,78 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        applicationId 'com.lyndir.masterpassword'
+        minSdkVersion 24
+        targetSdkVersion 28
+        versionCode 20701
+        versionName '2.7.1'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    externalNativeBuild {
+        cmake {
+            path 'CMakeLists.txt'
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs "$rootDir/lib/libsodium/build-android~/out/lib",
+                            "$rootDir/lib/libjson-c/build-android~/out/lib"
+        }
+    }
+
+    // release with: STORE_PW=$(mpw masterpassword.keystore) KEY_PW_ANDROID=$(mpw masterpassword-android) gradle masterpassword-android:assembleRelease
+    signingConfigs {
+        release {
+            storeFile file( 'masterpassword.keystore' )
+            storePassword System.getenv( 'STORE_PW' )
+
+            keyAlias 'masterpassword-android'
+            keyPassword System.getenv( 'KEY_PW_ANDROID' )
+        }
+    }
+    buildTypes {
+        release {
+            if (System.getenv( 'KEY_PW_ANDROID' ) != null)
+                signingConfig signingConfigs.release
+        }
+    }
+}
+
+dependencies {
+    api project( ':masterpassword-algorithm' )
+    implementation group: 'com.lyndir.lhunath.opal', name: 'opal-system', version: '1.7-p2'
+
+    implementation group: 'org.slf4j', name: 'slf4j-android', version: '1.7.13-underscore'
+    implementation group: 'com.jakewharton', name: 'butterknife', version: '10.2.0'
+    annotationProcessor group: 'com.jakewharton', name: 'butterknife-compiler', version: '10.2.0'
+}
+
+preBuild {
+    dependsOn task( type: Exec, 'build_libsodium-android', {
+        commandLine 'bash', "$rootDir/lib/bin/build_libsodium-android"
+        environment 'ANDROID_NDK_HOME', android.ndkDirectory
+    } )
+    dependsOn task( type: Exec, 'build_libjson-c-android', {
+        commandLine 'bash', "$rootDir/lib/bin/build_libjson-c-android"
+        environment 'ANDROID_NDK_HOME', android.ndkDirectory
+    } )
+}
+
+clean {
+    dependsOn task( type: Exec, 'clean_libsodium-android', {
+        commandLine 'bash', "$rootDir/lib/bin/build_libsodium-android", 'clean'
+        environment 'ANDROID_NDK_HOME', android.ndkDirectory
+    } )
+    dependsOn task( type: Exec, 'clean_libjson-c-android', {
+        commandLine 'bash', "$rootDir/lib/bin/build_libjson-c-android", 'clean'
+        environment 'ANDROID_NDK_HOME', android.ndkDirectory
+    } )
+}

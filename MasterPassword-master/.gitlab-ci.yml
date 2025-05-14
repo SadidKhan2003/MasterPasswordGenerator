@@ -1,0 +1,20 @@
+variables:
+  GIT_DEPTH: 3
+  GIT_SUBMODULE_STRATEGY: recursive
+
+build_project:
+  stage: build
+  script:
+    - "( brew bundle )"
+    - "( ./lib/bin/build_libsodium-macos clean && ./lib/bin/build_libsodium-macos )"
+    - "( ./lib/bin/build_libjson-c-macos clean && ./lib/bin/build_libjson-c-macos )"
+    - "( cd ./platform-independent/c/cli && ./clean && targets=all ./build && ./mpw-tests && ./mpw-cli-tests )"
+    - "( ./gradlew --stacktrace --info clean test )"
+    - "( cd platform-darwin && pod install )"
+    - "( xcodebuild -workspace platform-darwin/MasterPassword.xcworkspace -configuration 'Release' -scheme 'MasterPassword iOS' -sdk iphonesimulator clean build )"
+    - "( xcodebuild -workspace platform-darwin/MasterPassword.xcworkspace -configuration 'Release' -scheme 'MasterPassword macOS' clean build )"
+  tags:
+    - brew
+    - java
+    - cocoapods
+    - xcode
